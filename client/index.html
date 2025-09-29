@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <title>ChartAI - Professional Data Visualization</title>
+    <meta name="description" content="Transform your data into stunning, animated charts and infographics with AI-powered visualization technology.">
+    <link rel="stylesheet" href="/src/styles/main.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  </head>
+  <body>
+
+    <button id="theme-toggle" class="bg-blue-500 text-white p-2 rounded">Toggle Theme</button>
+    <!-- Navigation Header -->
+    <header class="navbar">
+      <div class="container">
+        <div class="navbar-brand">
+          <div class="logo">
+            <i data-lucide="bar-chart-3"></i>
+            <span>ChartAI</span>
+          </div>
+        </div>
+        <nav class="navbar-nav">
+          <a href="#features" class="nav-link" data-testid="link-features">Features</a>
+          <a href="#pricing" class="nav-link" data-testid="link-pricing">Pricing</a>
+          <a href="#support" class="nav-link" data-testid="link-support">Support</a>
+        </nav>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content" id="homePage">
+      <!-- Hero Section -->
+      <section class="hero">
+        <div class="container">
+          <div class="hero-content">
+            <h1 class="hero-title">Transform Your Data Into Beautiful Visualizations</h1>
+            <p class="hero-subtitle">Upload your data or describe it in plain text. Our AI will create stunning, animated charts and export them as professional videos.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Data Input Section -->
+      <section class="data-input-section">
+        <div class="container">
+          <div class="section-grid">
+            <!-- Text Input Panel -->
+            <div class="input-panel">
+              <div class="panel-header">
+                <div class="panel-title">
+                  <i data-lucide="file-text"></i>
+                  <h3>Describe Your Data</h3>
+                </div>
+                <p class="panel-subtitle">Describe your data in plain text and let AI create the perfect visualization</p>
+              </div>
+              <div class="panel-content">
+                <textarea 
+                  id="textInput" 
+                  class="data-textarea" 
+                  data-testid="input-data-text"
+                  placeholder="Example: Our company's revenue grew from $2M in 2021 to $5M in 2023. Q1: $2M, Q2: $2.5M, Q3: $3.2M, Q4: $4.1M, Q1 2022: $4.5M, Q2 2022: $5M..."
+                  rows="8"
+                ></textarea>
+                <div class="input-actions">
+                  <button id="clearTextBtn" class="btn btn-ghost" data-testid="button-clear-text">
+                    <i data-lucide="trash-2"></i>
+                    Clear
+                  </button>
+                  <button id="analyzeTextBtn" class="btn btn-primary" data-testid="button-generate-chart-text">
+                    <i data-lucide="sparkles"></i>
+                    Generate Chart
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- File Upload Panel -->
+            <div class="input-panel">
+              <div class="panel-header">
+                <div class="panel-title">
+                  <i data-lucide="upload"></i>
+                  <h3>Upload Data File</h3>
+                </div>
+                <p class="panel-subtitle">Upload CSV or TXT files for automatic data processing</p>
+              </div>
+              <div class="panel-content">
+                <div class="upload-area" id="uploadArea" data-testid="area-file-upload">
+                  <div class="upload-content">
+                    <div class="upload-icon">
+                      <i data-lucide="upload-cloud"></i>
+                    </div>
+                    <h4>Drop your file here</h4>
+                    <p>Or click to browse files</p>
+                    <div class="supported-formats">
+                      <span class="format-tag">CSV</span>
+                      <span class="format-tag">TXT</span>
+                    </div>
+                  </div>
+                  <input type="file" id="fileInput" accept=".csv,.txt" data-testid="input-file" hidden>
+                </div>
+                <div id="uploadedFile" class="uploaded-file" style="display: none;">
+                  <div class="file-info">
+                    <i data-lucide="file"></i>
+                    <span class="file-name" data-testid="text-uploaded-filename"></span>
+                  </div>
+                  <button id="removeFileBtn" class="btn btn-ghost btn-sm" data-testid="button-remove-file">
+                    <i data-lucide="x"></i>
+                  </button>
+                </div>
+                <div class="input-actions">
+                  <button id="analyzeFileBtn" class="btn btn-primary" disabled data-testid="button-generate-chart-file">
+                    <i data-lucide="sparkles"></i>
+                    Generate Chart
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chart Mode Selector -->
+          <div class="chart-mode-section">
+            <div class="section-header">
+              <h3>Chart Mode</h3>
+              <p>Choose whether to create a single chart or multiple charts from your data</p>
+            </div>
+            <div class="chart-modes">
+              <button class="chart-mode-btn active" data-mode="single" data-testid="button-chart-mode-single">
+                <i data-lucide="chart-bar"></i>
+                <span>Single Chart</span>
+                <small>Create one optimized chart from your data</small>
+              </button>
+              <button class="chart-mode-btn" data-mode="multi" data-testid="button-chart-mode-multi">
+                <i data-lucide="layout-grid"></i>
+                <span>Multiple Charts</span>
+                <small>Extract multiple datasets and create separate charts</small>
+              </button>
+            </div>
+          </div>
+
+          <!-- Chart Type Selector -->
+          <div class="chart-type-section">
+            <div class="section-header">
+              <h3>Choose Chart Type</h3>
+              <p>Select a specific chart type or let AI choose the best one</p>
+            </div>
+            <div class="chart-types">
+              <button class="chart-type-btn active" data-type="auto" data-testid="button-chart-type-auto">
+                <i data-lucide="zap"></i>
+                <span>AI Auto-Select</span>
+                <small>Let AI choose the best visualization</small>
+              </button>
+              <button class="chart-type-btn" data-type="bar" data-testid="button-chart-type-bar">
+                <i data-lucide="bar-chart-3"></i>
+                <span>Bar Chart</span>
+                <small>Compare values across categories</small>
+              </button>
+              <button class="chart-type-btn" data-type="pie" data-testid="button-chart-type-pie">
+                <i data-lucide="pie-chart"></i>
+                <span>Pie Chart</span>
+                <small>Show proportions and percentages</small>
+              </button>
+              <button class="chart-type-btn" data-type="line" data-testid="button-chart-type-line">
+                <i data-lucide="trending-up"></i>
+                <span>Line Chart</span>
+                <small>Display trends over time</small>
+              </button>
+              <button class="chart-type-btn" data-type="doughnut" data-testid="button-chart-type-doughnut">
+                <i data-lucide="circle"></i>
+                <span>Doughnut</span>
+                <small>Modern take on pie charts</small>
+              </button>
+              <button class="chart-type-btn" data-type="area" data-testid="button-chart-type-area">
+                <i data-lucide="activity"></i>
+                <span>Area Chart</span>
+                <small>Show cumulative trends</small>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Results Page (Initially Hidden) -->
+    <div class="results-page" id="resultsPage" style="display: none;">
+      <header class="results-header">
+        <div class="container">
+          <button id="backToHomeBtn" class="btn btn-ghost" data-testid="button-back-to-home">
+            <i data-lucide="arrow-left"></i>
+            Back to Home
+          </button>
+          <h1 data-testid="text-results-title">Your Visualization Results</h1>
+          <div class="results-actions">
+            <button id="downloadAllChartsBtn" class="btn btn-primary" data-testid="button-download-all-charts" style="display: none;">
+              <i data-lucide="download"></i>
+              Download All Charts
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main class="results-content">
+        <div class="container">
+          <!-- Loading State -->
+          <div id="loadingState" class="loading-state">
+            <div class="loading-spinner"></div>
+            <h3 data-testid="text-loading-title">Analyzing Your Data...</h3>
+            <p data-testid="text-loading-description">Our AI is processing your data and creating the perfect visualization</p>
+          </div>
+
+          <!-- Charts Display -->
+          <div id="chartsContainer" class="charts-container" data-testid="container-charts" style="display: none;">
+            <!-- Charts will be dynamically inserted here -->
+          </div>
+
+        </div>
+      </main>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+      <div class="loading-content">
+        <div class="loading-spinner"></div>
+        <h3 id="loadingText" data-testid="text-loading-overlay">Processing...</h3>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/src/scripts/main.js"></script>
+    <script>
+      // Initialize Lucide icons
+      lucide.createIcons();
+    </script>
+  </body>
+</html>
