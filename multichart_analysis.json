@@ -1,0 +1,363 @@
+{
+    "multiChartAnalysis": {
+        "title": "Multi-Dataset Analysis",
+        "description": "Analysis found 5 distinct datasets for visualization covering preferences, revenue trend, device usage, sales growth, and user distribution.",
+        "chartVariations": [
+            {
+                "chartType": "pie",
+                "confidence": 0.95,
+                "reason": "Employee work location preferences showing a majority favoring remote work.",
+                "title": "Work Preference Distribution"
+            },
+            {
+                "chartType": "line",
+                "confidence": 0.95,
+                "reason": "Company revenue development showing a significant increase from 2021 to 2023.",
+                "title": "Revenue Growth Over Time"
+            },
+            {
+                "chartType": "pie",
+                "confidence": 0.95,
+                "reason": "Visitor device preferences indicating majority use desktop followed by mobile and tablets.",
+                "title": "Device Usage for Website Visitors"
+            },
+            {
+                "chartType": "bar",
+                "confidence": 0.85,
+                "reason": "Sales growth by quarter showing increasing trends through the year.",
+                "title": "Quarterly Sales Growth"
+            },
+            {
+                "chartType": "pie",
+                "confidence": 0.95,
+                "reason": "User geographical distribution showing a fairly uniform spread across the specified regions.",
+                "title": "User Distribution by Region"
+            }
+        ]
+    },
+    "chartConfigs": [
+        {
+            "type": "pie",
+            "data": {
+                "labels": [
+                    "Remote Work",
+                    "Office Work"
+                ],
+                "datasets": [
+                    {
+                        "label": "Work Preference Distribution",
+                        "data": [
+                            65.0,
+                            35.0
+                        ],
+                        "backgroundColor": [
+                            "#3b82f6",
+                            "#22c55e"
+                        ],
+                        "borderWidth": 2,
+                        "borderColor": "#ffffff"
+                    }
+                ]
+            },
+            "options": {
+                "responsive": true,
+                "maintainAspectRatio": false,
+                "plugins": {
+                    "title": {
+                        "display": true,
+                        "text": "Work Preference Distribution",
+                        "font": {
+                            "size": 16,
+                            "weight": "bold"
+                        }
+                    },
+                    "legend": {
+                        "position": "bottom",
+                        "labels": {
+                            "color": "#4B5563",
+                            "font": {
+                                "size": 14
+                            }
+                        }
+                    }
+                },
+                "animation": {
+                    "duration": 2000,
+                    "easing": "easeInOutQuart"
+                }
+            },
+            "metadata": {
+                "confidence": 0.95,
+                "reason": "Employee work location preferences showing a majority favoring remote work.",
+                "rank": 1,
+                "datasetIndex": 0
+            }
+        },
+        {
+            "type": "line",
+            "data": {
+                "labels": [
+                    "2021",
+                    "2023"
+                ],
+                "datasets": [
+                    {
+                        "label": "Revenue Growth Over Time",
+                        "data": [
+                            2.0,
+                            5.0
+                        ],
+                        "backgroundColor": "#3b82f6",
+                        "borderWidth": 2,
+                        "borderColor": "#3b82f6",
+                        "fill": false,
+                        "tension": 0.4
+                    }
+                ]
+            },
+            "options": {
+                "responsive": true,
+                "maintainAspectRatio": false,
+                "plugins": {
+                    "title": {
+                        "display": true,
+                        "text": "Revenue Growth Over Time",
+                        "font": {
+                            "size": 16,
+                            "weight": "bold"
+                        }
+                    },
+                    "legend": {
+                        "position": "bottom",
+                        "labels": {
+                            "color": "#4B5563",
+                            "font": {
+                                "size": 14
+                            }
+                        }
+                    }
+                },
+                "animation": {
+                    "duration": 2000,
+                    "easing": "easeInOutQuart"
+                },
+                "scales": {
+                    "y": {
+                        "beginAtZero": true,
+                        "grid": {
+                            "color": "rgba(0, 0, 0, 0.1)"
+                        }
+                    },
+                    "x": {
+                        "grid": {
+                            "display": false
+                        }
+                    }
+                }
+            },
+            "metadata": {
+                "confidence": 0.95,
+                "reason": "Company revenue development showing a significant increase from 2021 to 2023.",
+                "rank": 2,
+                "datasetIndex": 1
+            }
+        },
+        {
+            "type": "pie",
+            "data": {
+                "labels": [
+                    "Mobile",
+                    "Desktop",
+                    "Tablets"
+                ],
+                "datasets": [
+                    {
+                        "label": "Device Usage for Website Visitors",
+                        "data": [
+                            40.0,
+                            45.0,
+                            15.0
+                        ],
+                        "backgroundColor": [
+                            "#3b82f6",
+                            "#22c55e",
+                            "#f59e0b"
+                        ],
+                        "borderWidth": 2,
+                        "borderColor": "#ffffff"
+                    }
+                ]
+            },
+            "options": {
+                "responsive": true,
+                "maintainAspectRatio": false,
+                "plugins": {
+                    "title": {
+                        "display": true,
+                        "text": "Device Usage for Website Visitors",
+                        "font": {
+                            "size": 16,
+                            "weight": "bold"
+                        }
+                    },
+                    "legend": {
+                        "position": "bottom",
+                        "labels": {
+                            "color": "#4B5563",
+                            "font": {
+                                "size": 14
+                            }
+                        }
+                    }
+                },
+                "animation": {
+                    "duration": 2000,
+                    "easing": "easeInOutQuart"
+                }
+            },
+            "metadata": {
+                "confidence": 0.95,
+                "reason": "Visitor device preferences indicating majority use desktop followed by mobile and tablets.",
+                "rank": 3,
+                "datasetIndex": 2
+            }
+        },
+        {
+            "type": "bar",
+            "data": {
+                "labels": [
+                    "Q1",
+                    "Q2",
+                    "Q3"
+                ],
+                "datasets": [
+                    {
+                        "label": "Quarterly Sales Growth",
+                        "data": [
+                            20.0,
+                            35.0,
+                            50.0
+                        ],
+                        "backgroundColor": [
+                            "#3b82f6",
+                            "#22c55e",
+                            "#f59e0b"
+                        ],
+                        "borderWidth": 2,
+                        "borderColor": "#ffffff"
+                    }
+                ]
+            },
+            "options": {
+                "responsive": true,
+                "maintainAspectRatio": false,
+                "plugins": {
+                    "title": {
+                        "display": true,
+                        "text": "Quarterly Sales Growth",
+                        "font": {
+                            "size": 16,
+                            "weight": "bold"
+                        }
+                    },
+                    "legend": {
+                        "position": "bottom",
+                        "labels": {
+                            "color": "#4B5563",
+                            "font": {
+                                "size": 14
+                            }
+                        }
+                    }
+                },
+                "animation": {
+                    "duration": 2000,
+                    "easing": "easeInOutQuart"
+                },
+                "scales": {
+                    "y": {
+                        "beginAtZero": true,
+                        "grid": {
+                            "color": "rgba(0, 0, 0, 0.1)"
+                        }
+                    },
+                    "x": {
+                        "grid": {
+                            "display": false
+                        }
+                    }
+                }
+            },
+            "metadata": {
+                "confidence": 0.85,
+                "reason": "Sales growth by quarter showing increasing trends through the year.",
+                "rank": 4,
+                "datasetIndex": 3
+            }
+        },
+        {
+            "type": "pie",
+            "data": {
+                "labels": [
+                    "Asia",
+                    "Europe",
+                    "North America",
+                    "Other Regions"
+                ],
+                "datasets": [
+                    {
+                        "label": "User Distribution by Region",
+                        "data": [
+                            30.0,
+                            25.0,
+                            20.0,
+                            25.0
+                        ],
+                        "backgroundColor": [
+                            "#3b82f6",
+                            "#22c55e",
+                            "#f59e0b",
+                            "#a855f7"
+                        ],
+                        "borderWidth": 2,
+                        "borderColor": "#ffffff"
+                    }
+                ]
+            },
+            "options": {
+                "responsive": true,
+                "maintainAspectRatio": false,
+                "plugins": {
+                    "title": {
+                        "display": true,
+                        "text": "User Distribution by Region",
+                        "font": {
+                            "size": 16,
+                            "weight": "bold"
+                        }
+                    },
+                    "legend": {
+                        "position": "bottom",
+                        "labels": {
+                            "color": "#4B5563",
+                            "font": {
+                                "size": 14
+                            }
+                        }
+                    }
+                },
+                "animation": {
+                    "duration": 2000,
+                    "easing": "easeInOutQuart"
+                }
+            },
+            "metadata": {
+                "confidence": 0.95,
+                "reason": "User geographical distribution showing a fairly uniform spread across the specified regions.",
+                "rank": 5,
+                "datasetIndex": 4
+            }
+        }
+    ],
+    "totalCharts": 5
+}

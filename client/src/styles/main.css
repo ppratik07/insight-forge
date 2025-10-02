@@ -814,6 +814,71 @@ body {
   }
 }
 
+
+body {
+  transition: background-color 0.3s, color 0.3s;
+}
+
+body.dark-theme {
+  background-color: #1f2937; /* Dark background */
+  color: #d1d5db; /* Light text */
+}
+
+body:not(.dark-theme) {
+  background-color: #ffffff; /* Light background */
+  color: #374151; /* Dark text */
+}
+
+
+/* ... (existing styles unchanged) */
+
+/* New: Extracted Charts */
+.extracted-charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-md);
+}
+
+.extracted-chart {
+  background: var(--white);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-sm);
+  text-align: center;
+}
+
+.extracted-chart img {
+  max-width: 100%;
+  height: auto;
+}
+
+.extracted-chart p {
+  margin-top: var(--spacing-sm);
+  color: var(--text-secondary);
+}
+
+/* New: PDF Query Section */
+.query-response {
+  background: var(--bg-secondary);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-light);
+  margin-top: var(--spacing-md);
+}
+
+.query-response h4 {
+  margin-bottom: var(--spacing-sm);
+}
+
+.query-response img {
+  max-width: 100%;
+  margin: var(--spacing-sm) 0;
+}
+
+/* ... (rest unchanged) */
+
+
 @media (max-width: 768px) {
   .hero-title {
     font-size: 2rem;
@@ -836,18 +901,4 @@ body {
   .chart-types {
     grid-template-columns: 1fr;
   }
-}
-
-body {
-    transition: background-color 0.3s, color 0.3s;
-}
-
-body.dark-theme {
-    background-color: #1f2937; /* Dark background */
-    color: #d1d5db; /* Light text */
-}
-
-body:not(.dark-theme) {
-    background-color: #ffffff; /* Light background */
-    color: #374151; /* Dark text */
 }

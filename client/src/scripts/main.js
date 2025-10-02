@@ -4,6 +4,8 @@ let currentChartMode = 'single'; // 'single' or 'multi'
 let currentData = null;
 let isProcessing = false;
 let uploadedFile = null;
+let uploadedPdf = null;  // New: For PDF
+let pdfSessionId = null;  // New: Store session_id from PDF upload
 
 // DOM Elements
 const homePage = document.getElementById('homePage');
@@ -22,6 +24,18 @@ const analyzeFileBtn = document.getElementById('analyzeFileBtn');
 const removeFileBtn = document.getElementById('removeFileBtn');
 const chartTypeButtons = document.querySelectorAll('.chart-type-btn');
 const chartModeButtons = document.querySelectorAll('.chart-mode-btn');
+
+// New PDF elements
+const pdfInput = document.getElementById('pdfInput');
+const pdfUploadArea = document.getElementById('pdfUploadArea');
+const uploadedPdfDisplay = document.getElementById('uploadedPdf');
+const analyzePdfBtn = document.getElementById('analyzePdfBtn');
+const removePdfBtn = document.getElementById('removePdfBtn');
+const extractedChartsContainer = document.getElementById('extractedChartsContainer');
+const pdfQuerySection = document.getElementById('pdfQuerySection');
+const pdfQueryInput = document.getElementById('pdfQueryInput');
+const submitPdfQueryBtn = document.getElementById('submitPdfQueryBtn');
+const pdfQueryResponse = document.getElementById('pdfQueryResponse');
 
 // Results page elements
 const backToHomeBtn = document.getElementById('backToHomeBtn');
@@ -150,11 +164,13 @@ function showHomePage() {
   resultsPage.style.display = 'none';
 }
 
-function showResultsPage() {
+function showResultsPage(showPdfSection = false) {
   homePage.style.display = 'none';
   resultsPage.style.display = 'block';
   loadingState.style.display = 'block';
   chartsContainer.style.display = 'none';
+  extractedChartsContainer.style.display = 'none';
+  pdfQuerySection.style.display = showPdfSection ? 'block' : 'none';  // New: Toggle PDF query section
 }
 
 function formatDataForChart(chartData, chartType) {
@@ -569,51 +585,54 @@ function showNotification(message, type = 'info') {
 async function analyzeTextData(text, chartType = 'auto') {
   const response = await fetch(`${API_BASE_URL}/api/analyze-data`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({ text, chartType }),
   });
-  
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`HTTP ${response.status}: ${errorText}`);
-  }
-  
+  if (!response.ok) throw new Error(`HTTP ${response.status}: ${await response.text()}`);
   return await response.json();
 }
 
 async function analyzeTextDataMulti(text, maxCharts = 5) {
   const response = await fetch(`${API_BASE_URL}/api/analyze-data-multi`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({ text, maxCharts }),
   });
-  
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`HTTP ${response.status}: ${errorText}`);
-  }
-  
+  if (!response.ok) throw new Error(`HTTP ${response.status}: ${await response.text()}`);
   return await response.json();
 }
 
 async function parseCSVData(csvContent) {
   const response = await fetch(`${API_BASE_URL}/api/parse-csv`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({ csvContent }),
   });
+  if (!response.ok) throw new Error(`HTTP ${response.status}: ${await response.text()}`);
+  return await response.json();
+}
+
+// New: Upload PDF API
+async function uploadPdf(pdfFile) {
+  const formData = new FormData();
+  formData.append('file', pdfFile);
   
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`HTTP ${response.status}: ${errorText}`);
-  }
-  
+  const response = await fetch(`${API_BASE_URL}/api/upload-pdf`, {
+    method: 'POST',
+    body: formData,
+  });
+  if (!response.ok) throw new Error(`HTTP ${response.status}: ${await response.text()}`);
+  return await response.json();
+}
+
+// New: Query PDF API
+async function queryPdf(query, sessionId) {
+  const response = await fetch(`${API_BASE_URL}/api/query`, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ query, session_id: sessionId }),
+  });
+  if (!response.ok) throw new Error(`HTTP ${response.status}: ${await response.text()}`);
   return await response.json();
 }
 
@@ -767,6 +786,177 @@ async function analyzeFile() {
   } finally {
     isProcessing = false;
     analyzeFileBtn.disabled = false;
+  }
+}
+
+// New: PDF Upload Handlers
+function handlePdfUpload(event) {
+  const file = event.target.files[0];
+  if (!file || file.type !== 'application/pdf') {
+    alert('Please upload a PDF file.');
+    return;
+  }
+  
+  uploadedPdf = file;
+  pdfUploadArea.style.display = 'none';
+  uploadedPdfDisplay.style.display = 'flex';
+  uploadedPdfDisplay.querySelector('.pdf-name').textContent = file.name;
+  analyzePdfBtn.disabled = false;
+}
+
+function handlePdfDrop(event) {
+  event.preventDefault();
+  pdfUploadArea.classList.remove('drag-active');
+  
+  const file = event.dataTransfer.files[0];
+  if (!file || file.type !== 'application/pdf') {
+    alert('Please upload a PDF file.');
+    return;
+  }
+  
+  pdfInput.files = new DataTransfer().items.add(file).files;
+  handlePdfUpload({ target: { files: [file] } });
+}
+
+function removePdf() {
+  uploadedPdf = null;
+  pdfUploadArea.style.display = 'block';
+  uploadedPdfDisplay.style.display = 'none';
+  pdfInput.value = '';
+  analyzePdfBtn.disabled = true;
+  pdfSessionId = null;
+}
+
+async function analyzePdf() {
+  if (!uploadedPdf || isProcessing) return;
+  
+  isProcessing = true;
+  analyzePdfBtn.disabled = true;
+  
+  try {
+    showLoading('Processing your PDF...');
+    
+    const result = await uploadPdf(uploadedPdf);
+    
+    hideLoading();
+    
+    if (result.success) {
+      pdfSessionId = result.session_id;
+      showResultsPage(true);  // Show PDF query section
+      displayExtractedCharts(result.extracted_charts);  // New: Display extracted charts
+    } else {
+      alert('Error processing PDF: ' + (result.error || 'Unknown error'));
+    }
+  } catch (error) {
+    hideLoading();
+    alert('Error processing PDF: ' + error.message);
+  } finally {
+    isProcessing = false;
+    analyzePdfBtn.disabled = false;
+  }
+}
+
+// New: Display Extracted Charts
+// function displayExtractedCharts(charts) {
+//   extractedChartsContainer.innerHTML = '';
+//   if (charts && charts.length > 0) {
+//     extractedChartsContainer.style.display = 'block';
+//     charts.forEach((chart, index) => {
+//       const imgElement = document.createElement('div');
+//       imgElement.className = 'extracted-chart';
+//       imgElement.innerHTML = `
+//         <img src="${chart.base64}" alt="Extracted Chart ${index + 1}" style="max-width: 100%; margin-bottom: 10px;">
+//         <p>${chart.description}</p>
+//       `;
+//       extractedChartsContainer.querySelector('.extracted-charts-grid').appendChild(imgElement);
+//     });
+//   } else {
+//     extractedChartsContainer.style.display = 'none';
+//   }
+// }
+
+// client/src/scripts/main.js
+// ... (other code unchanged)
+
+// New: Display Extracted Charts
+function displayExtractedCharts(charts) {
+  extractedChartsContainer.innerHTML = ''; // Clear previous content
+  if (charts && charts.length > 0) {
+    extractedChartsContainer.style.display = 'block';
+    // Ensure .extracted-charts-grid exists
+    let grid = extractedChartsContainer.querySelector('.extracted-charts-grid');
+    if (!grid) {
+      grid = document.createElement('div');
+      grid.className = 'extracted-charts-grid';
+      extractedChartsContainer.appendChild(grid);
+    }
+    // Add title if not present
+    if (!extractedChartsContainer.querySelector('h3')) {
+      const title = document.createElement('h3');
+      title.textContent = 'Extracted Charts from PDF';
+      extractedChartsContainer.insertBefore(title, grid);
+    }
+    charts.forEach((chart, index) => {
+      const imgElement = document.createElement('div');
+      imgElement.className = 'extracted-chart';
+      imgElement.innerHTML = `
+        <img src="${chart.base64}" alt="Extracted Chart ${index + 1}" style="max-width: 100%; margin-bottom: 10px;">
+        <p>${chart.description}</p>
+      `;
+      grid.appendChild(imgElement);
+    });
+  } else {
+    extractedChartsContainer.style.display = 'none';
+  }
+}
+
+// ... (rest of the file unchanged)
+
+// New: Submit PDF Query
+async function submitPdfQuery() {
+  const query = pdfQueryInput.value.trim();
+  if (!query || !pdfSessionId || isProcessing) return;
+  
+  isProcessing = true;
+  submitPdfQueryBtn.disabled = true;
+  
+  try {
+    showLoading('Querying your PDF...');
+    
+    const result = await queryPdf(query, pdfSessionId);
+    
+    hideLoading();
+    
+    if (result.success) {
+      const data = result.data;
+      pdfQueryResponse.innerHTML = `<p><strong>Answer:</strong> ${data.answer}</p>`;
+      
+      if (data.intent === 'viz' && data.chart_config) {
+        // Render generated chart
+        chartsContainer.style.display = 'block';
+        chartsContainer.innerHTML = '';
+        const chartCard = createChartElement({ title: 'Generated Chart from Query', description: data.answer }, data.confidence || 0.9);
+        chartsContainer.appendChild(chartCard);
+        const canvas = chartCard.querySelector('.chart-canvas');
+        renderChart(canvas, data.chart_config.data, data.chart_config.type, 'Generated Chart');
+      }
+      
+      if (data.existing_charts && data.existing_charts.length > 0) {
+        pdfQueryResponse.innerHTML += '<h4>Relevant Existing Charts:</h4>';
+        data.existing_charts.forEach(chart => {
+          pdfQueryResponse.innerHTML += `<img src="${chart.base64}" alt="Existing Chart" style="max-width: 300px; margin: 10px;"><p>${chart.description}</p>`;
+        });
+      }
+    } else {
+      alert('Error querying PDF: ' + (result.error || 'Unknown error'));
+    }
+  } catch (error) {
+    hideLoading();
+    alert('Error querying PDF: ' + error.message);
+  } finally {
+    isProcessing = false;
+    submitPdfQueryBtn.disabled = false;
+    pdfQueryInput.value = '';  // Clear input
   }
 }
 
@@ -933,6 +1123,19 @@ function initializeEventListeners() {
   // Results page
   backToHomeBtn.addEventListener('click', backToHome);
   downloadAllChartsBtn.addEventListener('click', downloadAllCharts);
+
+  // New: PDF upload listeners
+  pdfInput.addEventListener('change', handlePdfUpload);
+  pdfUploadArea.addEventListener('click', () => pdfInput.click());
+  pdfUploadArea.addEventListener('dragover', (e) => { e.preventDefault(); pdfUploadArea.classList.add('drag-active'); });
+  pdfUploadArea.addEventListener('dragleave', () => pdfUploadArea.classList.remove('drag-active'));
+  pdfUploadArea.addEventListener('drop', handlePdfDrop);
+  removePdfBtn.addEventListener('click', removePdf);
+  analyzePdfBtn.addEventListener('click', analyzePdf);
+  
+  // New: PDF query listener
+  submitPdfQueryBtn.addEventListener('click', submitPdfQuery);
+  pdfQueryInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') submitPdfQuery(); });
   
   // Initialize button states
   handleTextInput();

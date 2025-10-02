@@ -1,0 +1,83 @@
+{
+    "analyzedData": {
+        "title": "Distribution of Device Usage",
+        "dataPoints": [
+            {
+                "label": "Mobile",
+                "value": 40.0,
+                "unit": "%"
+            },
+            {
+                "label": "Desktop",
+                "value": 45.0,
+                "unit": "%"
+            },
+            {
+                "label": "Tablet",
+                "value": 15.0,
+                "unit": "%"
+            }
+        ],
+        "chartType": "pie",
+        "confidence": 0.95,
+        "description": "This pie chart shows the percentage distribution of device usage, with Desktop having the highest usage followed by Mobile and Tablet."
+    },
+    "chartConfig": {
+        "type": "pie",
+        "data": {
+            "labels": [
+                "Mobile",
+                "Desktop",
+                "Tablet"
+            ],
+            "datasets": [
+                {
+                    "label": "Distribution of Device Usage",
+                    "data": [
+                        40.0,
+                        45.0,
+                        15.0
+                    ],
+                    "backgroundColor": [
+                        "#3b82f6",
+                        "#22c55e",
+                        "#f59e0b"
+                    ],
+                    "borderWidth": 2,
+                    "borderColor": "#ffffff"
+                }
+            ]
+        },
+        "options": {
+            "responsive": true,
+            "maintainAspectRatio": false,
+            "plugins": {
+                "title": {
+                    "display": true,
+                    "text": "Distribution of Device Usage",
+                    "font": {
+                        "size": 16,
+                        "weight": "bold"
+                    }
+                },
+                "legend": {
+                    "position": "bottom",
+                    "labels": {
+                        "color": "#4B5563",
+                        "font": {
+                            "size": 14
+                        }
+                    }
+                }
+            },
+            "animation": {
+                "duration": 2000,
+                "easing": "easeInOutQuart"
+            }
+        }
+    },
+    "confidence": {
+        "pie": 0.95,
+        "auto": 1.0
+    }
+}

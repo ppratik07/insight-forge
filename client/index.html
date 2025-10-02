@@ -13,8 +13,6 @@
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
   </head>
   <body>
-
-    <button id="theme-toggle" class="bg-blue-500 text-white p-2 rounded">Toggle Theme</button>
     <!-- Navigation Header -->
     <header class="navbar">
       <div class="container">
@@ -78,7 +76,7 @@
               </div>
             </div>
 
-            <!-- File Upload Panel -->
+            <!-- File Upload Panel (CSV/TXT) -->
             <div class="input-panel">
               <div class="panel-header">
                 <div class="panel-title">
@@ -119,6 +117,48 @@
                 </div>
               </div>
             </div>
+
+            <!-- New PDF Upload Panel -->
+            <div class="input-panel">
+              <div class="panel-header">
+                <div class="panel-title">
+                  <i data-lucide="file-pdf"></i>  <!-- Assuming Lucide has a PDF icon; adjust if needed -->
+                  <h3>Upload PDF File</h3>
+                </div>
+                <p class="panel-subtitle">Upload PDF files for data extraction, Q&A, and visualization</p>
+              </div>
+              <div class="panel-content">
+                <div class="upload-area" id="pdfUploadArea">
+                  <div class="upload-content">
+                    <div class="upload-icon">
+                      <i data-lucide="upload-cloud"></i>
+                    </div>
+                    <h4>Drop your PDF here</h4>
+                    <p>Or click to browse</p>
+                    <div class="supported-formats">
+                      <span class="format-tag">PDF</span>
+                    </div>
+                  </div>
+                  <input type="file" id="pdfInput" accept=".pdf" hidden>
+                </div>
+                <div id="uploadedPdf" class="uploaded-file" style="display: none;">
+                  <div class="file-info">
+                    <i data-lucide="file"></i>
+                    <span class="pdf-name"></span>
+                  </div>
+                  <button id="removePdfBtn" class="btn btn-ghost btn-sm">
+                    <i data-lucide="x"></i>
+                  </button>
+                </div>
+                <div class="input-actions">
+                  <button id="analyzePdfBtn" class="btn btn-primary" disabled>
+                    <i data-lucide="sparkles"></i>
+                    Upload & Analyze PDF
+                  </button>
+                </div>
+              </div>
+            </div>
+
           </div>
 
           <!-- Chart Mode Selector -->
@@ -209,6 +249,25 @@
             <div class="loading-spinner"></div>
             <h3 data-testid="text-loading-title">Analyzing Your Data...</h3>
             <p data-testid="text-loading-description">Our AI is processing your data and creating the perfect visualization</p>
+          </div>
+
+          <!-- New: Extracted Charts from PDF -->
+          <div id="extractedChartsContainer" style="display: none;">
+            <h3>Extracted Charts from PDF</h3>
+            <div class="extracted-charts-grid">
+              <!-- Dynamically insert <img src="base64" /> with descriptions -->
+            </div>
+          </div>
+
+          <!-- New: PDF Query Section -->
+          <div id="pdfQuerySection" style="display: none; margin-top: 20px;">
+            <h3>Ask Questions About Your PDF</h3>
+            <input type="text" id="pdfQueryInput" class="data-textarea" placeholder="e.g., What is the sales trend? Or summarize the report..." />
+            <button id="submitPdfQueryBtn" class="btn btn-primary">
+              <i data-lucide="search"></i>
+              Ask
+            </button>
+            <div id="pdfQueryResponse" class="query-response" style="margin-top: 20px;"></div>  <!-- For answers -->
           </div>
 
           <!-- Charts Display -->

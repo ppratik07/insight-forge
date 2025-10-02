@@ -1,5 +1,5 @@
 import os
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, UploadFile, File
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -9,7 +9,9 @@ import datetime
 
 from app.routes import router  # We'll define this below
 
+# Load environment variables
 load_dotenv()
+print(f"Loaded OPENAI_API_KEY: {os.getenv('OPENAI_API_KEY')[:4]}...{os.getenv('OPENAI_API_KEY')[-4:]}")
 
 app = FastAPI(title="ChartAI Backend")
 
