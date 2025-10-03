@@ -1,44 +1,4 @@
-# # python_backend/app/routes.py
-# from fastapi import APIRouter, Body, HTTPException, UploadFile, File, Form
-# from pydantic import BaseModel, Field
-# from typing import Optional, List, Dict, Any
-# import datetime
-# import json
-# import tempfile
-# import os
-# import uuid
 
-# from app.ai.analyzer import (
-#     analyze_text_data,
-#     analyze_multiple_datasets_from_text,
-#     convert_to_chart_data,
-#     convert_multiple_datasets_to_configs,
-#     AnalyzedData,
-#     MultiChartAnalysis
-# )
-# from app.ai.csv_parser import parse_csv_data, ParsedCSV
-# import app.ai.rag_pipeline as rag_mod  # Import as module
-
-# # Initialize RAG
-# api_key = os.getenv("OPENAI_API_KEY")
-# if not api_key:
-#     print("Error: OPENAI_API_KEY not found in environment")
-#     raise Exception("RAG initialization error: OPENAI_API_KEY not found")
-# try:
-#     print("Attempting to initialize RAG pipeline...")
-#     rag_mod.init_rag_pipeline(api_key)
-#     if rag_mod.rag_pipeline is None:
-#         print("Error: RAG pipeline initialization returned None")
-#         raise ValueError("Failed to initialize RAG pipeline: rag_pipeline is None")
-#     print("RAG pipeline loaded successfully")
-# except Exception as e:
-#     print(f"Failed to initialize RAG pipeline: {str(e)}")
-#     raise Exception(f"RAG initialization error: {str(e)}")
-
-# router = APIRouter(prefix="/api")
-
-
-# python_backend/app/routes.py
 from fastapi import APIRouter, Body, HTTPException, UploadFile, File, Form
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any
@@ -47,6 +7,7 @@ import json
 import tempfile
 import os
 import uuid
+import shutil
 
 from app.ai.analyzer import (
     analyze_text_data,
@@ -234,12 +195,23 @@ async def query_pdf(req: QueryRequest = Body(...)):
 @router.delete("/clear-session/{session_id}")
 async def clear_session(session_id: str):
     try:
-        session_file = os.path.join(SESSION_DIR, f"{session_id}.pkl")
-        if os.path.exists(session_file):
-            os.unlink(session_file)
-            _sessions.pop(session_id, None)
-            return {"success": True, "message": f"Session {session_id} cleared"}
-        return {"success": True, "message": f"Session {session_id} not found"}
+        # Remove from MongoDB
+        if rag_mod.mongo_collection is not None:
+            rag_mod.mongo_collection.delete_one({"session_id": session_id})
+            print(f"Deleted session {session_id} from MongoDB Atlas")
+        # Remove from JSON
+        meta_path = os.path.join(rag_mod.METADATA_DIR, f"{session_id}.json")
+        if os.path.exists(meta_path):
+            os.unlink(meta_path)
+            print(f"Deleted session {session_id} from JSON")
+        # Remove FAISS index
+        index_path = os.path.join(rag_mod.INDEX_DIR, session_id)
+        if os.path.isdir(index_path):
+            shutil.rmtree(index_path)
+            print(f"Deleted FAISS index for session {session_id}")
+        # Remove from in-memory cache
+        rag_mod._sessions.pop(session_id, None)
+        return {"success": True, "message": f"Session {session_id} cleared"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to clear session: {str(e)}")
 

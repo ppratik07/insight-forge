@@ -829,23 +829,22 @@ function removePdf() {
 
 async function analyzePdf() {
   if (!uploadedPdf || isProcessing) return;
-  
   isProcessing = true;
   analyzePdfBtn.disabled = true;
-  
   try {
     showLoading('Processing your PDF...');
-    
     const result = await uploadPdf(uploadedPdf);
-    
     hideLoading();
-    
     if (result.success) {
       pdfSessionId = result.session_id;
-      showResultsPage(true);  // Show PDF query section
-      displayExtractedCharts(result.extracted_charts);  // New: Display extracted charts
+      showResultsPage(true);
+      displayExtractedCharts(result.extracted_charts);
+      // Display session ID for reuse
+      const sessionInfo = document.createElement('p');
+      sessionInfo.textContent = `Session ID: ${pdfSessionId} (Save this to reuse without reprocessing)`;
+      extractedChartsContainer.appendChild(sessionInfo);
     } else {
-      alert('Error processing PDF: ' + (result.error || 'Unknown error'));
+      alert('Error processing PDF: ' + (result.error || result.detail || 'Unknown error'));
     }
   } catch (error) {
     hideLoading();
@@ -856,27 +855,33 @@ async function analyzePdf() {
   }
 }
 
-// New: Display Extracted Charts
-// function displayExtractedCharts(charts) {
-//   extractedChartsContainer.innerHTML = '';
-//   if (charts && charts.length > 0) {
-//     extractedChartsContainer.style.display = 'block';
-//     charts.forEach((chart, index) => {
-//       const imgElement = document.createElement('div');
-//       imgElement.className = 'extracted-chart';
-//       imgElement.innerHTML = `
-//         <img src="${chart.base64}" alt="Extracted Chart ${index + 1}" style="max-width: 100%; margin-bottom: 10px;">
-//         <p>${chart.description}</p>
-//       `;
-//       extractedChartsContainer.querySelector('.extracted-charts-grid').appendChild(imgElement);
-//     });
-//   } else {
-//     extractedChartsContainer.style.display = 'none';
-//   }
-// }
+// Add function to query with existing session ID
+function queryWithSessionId() {
+  const sessionIdInput = prompt('Enter Session ID to reuse:');
+  if (sessionIdInput) {
+    pdfSessionId = sessionIdInput;
+    showResultsPage(true);
+    // Optionally fetch charts for the session
+    fetch(`/api/query`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: 'List all charts', session_id: pdfSessionId })
+    })
+      .then(response => response.json())
+      .then(result => {
+        if (result.success && result.data.existing_charts) {
+          displayExtractedCharts(result.data.existing_charts);
+        } else {
+          alert('Failed to load session: ' + (result.detail || 'Invalid session ID'));
+        }
+      })
+      .catch(error => alert('Error querying session: ' + error.message));
+  }
+}
 
-// client/src/scripts/main.js
-// ... (other code unchanged)
+// Add button to reuse session ID (add to index.html and call this function)
+document.getElementById('reuseSessionBtn')?.addEventListener('click', queryWithSessionId);
+
 
 // New: Display Extracted Charts
 function displayExtractedCharts(charts) {
@@ -1146,3 +1151,25 @@ document.addEventListener('DOMContentLoaded', () => {
   initializeEventListeners();
   showHomePage();
 });
+
+function clearSession() {
+  if (!pdfSessionId) {
+    alert("No session ID available to clear");
+    return;
+  }
+  fetch(`/api/clear-session/${pdfSessionId}`, { method: 'DELETE' })
+    .then(response => response.json())
+    .then(result => {
+      if (result.success) {
+        alert(result.message);
+        pdfSessionId = null;
+        showResultsPage(false);
+      } else {
+        alert('Failed to clear session: ' + (result.detail || 'Unknown error'));
+      }
+    })
+    .catch(error => alert('Error clearing session: ' + error.message));
+}
+
+// Add to event listeners
+document.getElementById('clearSessionBtn')?.addEventListener('click', clearSession);
